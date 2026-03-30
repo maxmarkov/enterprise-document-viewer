@@ -1,5 +1,5 @@
 // Brand
-export const BRAND_NAME = 'Document Intelligence';
+export const BRAND_NAME = 'Business Intelligence';
 export const BRAND_TAGLINE = 'Review & Extraction Platform';
 
 // Zoom

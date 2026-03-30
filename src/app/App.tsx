@@ -1,24 +1,23 @@
 import { useState } from 'react';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
-import { DocumentViewer } from './components/DocumentViewer';
-import { MarkdownViewer } from './components/MarkdownViewer';
-import { JsonViewer } from './components/JsonViewer';
+import { ViewerPanel } from './components/ViewerPanel';
 import { EmptyState } from './components/EmptyState';
-import type { FolderRecord } from './data/mockData';
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from './components/ui/resizable';
 import { toast } from 'sonner';
 import { Toaster } from './components/ui/sonner';
 import { scanDirectory } from './utils/folderScanner';
+import { useLang } from './i18n/LangContext';
+import type { FolderRecord } from './data/mockData';
 
 type ScanStatus = 'idle' | 'scanning' | 'ready';
 
 export default function App() {
+  const { t } = useLang();
   const [folders, setFolders] = useState<FolderRecord[]>([]);
   const [selectedFolderId, setSelectedFolderId] = useState<string | undefined>();
   const [rootFolderName, setRootFolderName] = useState<string | undefined>();
   const [scanStatus, setScanStatus] = useState<ScanStatus>('idle');
-  const [showPdf, setShowPdf] = useState(false);
+  const [compareMode, setCompareMode] = useState(false);
 
   const selectedFolder = folders.find((f) => f.id === selectedFolderId);
 
@@ -37,14 +36,17 @@ export default function App() {
       setScanStatus('ready');
 
       if (records.length === 0) {
-        toast.info('No document folders found.');
+        toast.info(t.noFoldersFound);
       } else {
-        toast.success(`Found ${records.length} folder${records.length !== 1 ? 's' : ''}`);
+        const msg = records.length === 1
+          ? t.foundFolder
+          : t.foundFolders.replace('{n}', String(records.length));
+        toast.success(msg);
         setSelectedFolderId(records[0].id);
       }
     } catch (err: unknown) {
       if ((err as { name?: string })?.name !== 'AbortError') {
-        toast.error('Could not open folder.');
+        toast.error(t.couldNotOpenFolder);
         console.error('[App] folder pick error:', err);
       }
       setScanStatus('idle');
@@ -58,8 +60,8 @@ export default function App() {
       <Header
         folderPath={selectedFolder ? `${rootFolderName}/${selectedFolder.path}` : rootFolderName}
         onRefresh={handlePickFolder}
-        showPdf={showPdf}
-        onTogglePdf={() => setShowPdf((v) => !v)}
+        compareMode={compareMode}
+        onToggleCompare={() => setCompareMode((v) => !v)}
       />
 
       <div className="flex flex-1 overflow-hidden">
@@ -76,33 +78,22 @@ export default function App() {
             <div className="flex h-full items-center justify-center bg-[#f8f9fc]">
               <div className="flex flex-col items-center gap-3">
                 <div className="h-8 w-8 rounded-full border-2 border-brand-navy/20 border-t-brand-navy animate-spin" />
-                <p className="text-sm text-gray-400">Scanning folder…</p>
+                <p className="text-sm text-gray-400">{t.scanningFolder}</p>
               </div>
             </div>
           ) : selectedFolder ? (
-            <ResizablePanelGroup direction="horizontal" className="h-full">
-              {showPdf && (
-                <>
-                  <ResizablePanel defaultSize={35} minSize={20} maxSize={50} collapsible collapsedSize={0}>
-                    <div className="h-full border-r border-gray-200">
-                      <DocumentViewer document={selectedFolder.files.document} />
-                    </div>
-                  </ResizablePanel>
-                  <ResizableHandle className="w-[3px] bg-gray-200 hover:bg-brand-navy transition-colors duration-150" />
-                </>
-              )}
-
-              <ResizablePanel defaultSize={showPdf ? 65 : 100} minSize={30}>
-                <div className="h-full flex">
-                  <div className="flex-1 overflow-hidden border-r border-gray-200">
-                    <MarkdownViewer markdown={selectedFolder.files.markdown} />
-                  </div>
-                  <div className="flex-1 overflow-hidden">
-                    <JsonViewer json={selectedFolder.files.json} />
-                  </div>
+            compareMode ? (
+              <div className="flex h-full">
+                <div className="flex-1 min-w-0 border-r border-gray-200">
+                  <ViewerPanel key={`${selectedFolder.id}-left`} folder={selectedFolder} />
                 </div>
-              </ResizablePanel>
-            </ResizablePanelGroup>
+                <div className="flex-1 min-w-0">
+                  <ViewerPanel key={`${selectedFolder.id}-right`} folder={selectedFolder} />
+                </div>
+              </div>
+            ) : (
+              <ViewerPanel key={selectedFolder.id} folder={selectedFolder} />
+            )
           ) : (
             <EmptyState type="no-selection" />
           )}

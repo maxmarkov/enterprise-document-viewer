@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { FileJson, Copy, Check } from 'lucide-react';
+import { useLang } from '../i18n/LangContext';
 import { Button } from './ui/button';
 import { EmptyState } from './EmptyState';
 import { Section } from './json/Section';
@@ -23,6 +24,7 @@ function isSectionList(data: unknown): data is SectionItem[] {
 }
 
 export function JsonViewer({ json }: JsonViewerProps) {
+  const { t } = useLang();
   const [copied, setCopied] = useState(false);
 
   if (!json) return <EmptyState type="no-json" />;
@@ -45,14 +47,14 @@ export function JsonViewer({ json }: JsonViewerProps) {
           <div className="flex h-6 w-6 items-center justify-center rounded-md bg-emerald-50">
             <FileJson className="h-3.5 w-3.5 text-emerald-600" />
           </div>
-          <span className="font-semibold text-sm text-gray-800">Structured Data</span>
+          <span className="font-semibold text-sm text-gray-800">{t.structuredData}</span>
           <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-600">JSON</span>
           <span className="text-xs text-gray-400">{json.size}</span>
         </div>
         <Button variant="ghost" size="sm" onClick={handleCopy} className="h-7 gap-1.5 text-xs px-2">
           {copied
-            ? <><Check className="h-3.5 w-3.5 text-green-600" />Copied</>
-            : <><Copy className="h-3.5 w-3.5" />Copy</>}
+            ? <><Check className="h-3.5 w-3.5 text-green-600" />{t.copied}</>
+            : <><Copy className="h-3.5 w-3.5" />{t.copy}</>}
         </Button>
       </div>
 

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { useLang } from '../i18n/LangContext';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import { FileText, Copy, Check } from 'lucide-react';
@@ -13,6 +14,7 @@ interface MarkdownViewerProps {
 }
 
 export function MarkdownViewer({ markdown }: MarkdownViewerProps) {
+  const { t } = useLang();
   const [copied, setCopied] = useState(false);
 
   if (!markdown) return <EmptyState type="no-markdown" />;
@@ -32,14 +34,14 @@ export function MarkdownViewer({ markdown }: MarkdownViewerProps) {
           <div className="flex h-6 w-6 items-center justify-center rounded-md bg-violet-50">
             <FileText className="h-3.5 w-3.5 text-violet-600" />
           </div>
-          <span className="font-semibold text-sm text-gray-800">Notes</span>
+          <span className="font-semibold text-sm text-gray-800">{t.notes}</span>
           <span className="rounded-md bg-violet-50 px-2 py-0.5 text-[11px] font-medium text-violet-600">MD</span>
           <span className="text-xs text-gray-400">{markdown.size}</span>
         </div>
         <Button variant="ghost" size="sm" onClick={handleCopy} className="h-7 gap-1.5 text-xs px-2">
           {copied
-            ? <><Check className="h-3.5 w-3.5 text-green-600" />Copied</>
-            : <><Copy className="h-3.5 w-3.5" />Copy</>}
+            ? <><Check className="h-3.5 w-3.5 text-green-600" />{t.copied}</>
+            : <><Copy className="h-3.5 w-3.5" />{t.copy}</>}
         </Button>
       </div>
 

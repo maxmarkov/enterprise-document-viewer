@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
+import { useLang } from '../i18n/LangContext';
 import { ZoomIn, ZoomOut, ChevronLeft, ChevronRight, FileText } from 'lucide-react';
 import { Button } from './ui/button';
 import { cn } from './ui/utils';
@@ -17,6 +18,7 @@ interface DocumentViewerProps {
 }
 
 export function DocumentViewer({ document }: DocumentViewerProps) {
+  const { t } = useLang();
   const [zoom, setZoom] = useState(ZOOM_DEFAULT);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -43,7 +45,7 @@ export function DocumentViewer({ document }: DocumentViewerProps) {
           <div className="flex h-6 w-6 items-center justify-center rounded-md bg-brand-navy/10">
             <FileText className="h-3.5 w-3.5 text-brand-navy" />
           </div>
-          <span className="font-semibold text-sm text-gray-800">Document</span>
+          <span className="font-semibold text-sm text-gray-800">{t.document}</span>
           <span className="rounded-md bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-500">
             {document.type.toUpperCase()}
           </span>
@@ -96,12 +98,12 @@ export function DocumentViewer({ document }: DocumentViewerProps) {
               loading={
                 <div className="flex flex-col items-center justify-center gap-3 w-[600px] h-[800px] bg-white shadow-xl rounded-sm">
                   <div className="h-7 w-7 rounded-full border-2 border-brand-navy/20 border-t-brand-navy animate-spin" />
-                  <span className="text-xs text-gray-400">Loading PDF…</span>
+                  <span className="text-xs text-gray-400">{t.loadingPdf}</span>
                 </div>
               }
               error={
                 <div className="flex items-center justify-center w-[600px] h-[800px] bg-white shadow-xl rounded-sm">
-                  <span className="text-sm text-red-400">Failed to load PDF.</span>
+                  <span className="text-sm text-red-400">{t.failedToLoadPdf}</span>
                 </div>
               }
             >

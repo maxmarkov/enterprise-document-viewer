@@ -3,6 +3,7 @@ import { Button } from './ui/button';
 import { ScrollArea } from './ui/scroll-area';
 import { cn } from './ui/utils';
 import type { FolderRecord } from '../data/mockData';
+import { useLang } from '../i18n/LangContext';
 
 interface SidebarProps {
   folders: FolderRecord[];
@@ -17,6 +18,7 @@ function countComplete(folders: FolderRecord[]) {
 }
 
 export function Sidebar({ folders, selectedId, onSelectFolder, onOpenFolder, rootFolderName }: SidebarProps) {
+  const { t } = useLang();
   return (
     <div className="flex h-full w-64 flex-col bg-[#f8f9fc] border-r border-gray-200 flex-shrink-0">
       <div className="px-3 py-3 border-b border-gray-200 bg-white flex-shrink-0">
@@ -25,7 +27,7 @@ export function Sidebar({ folders, selectedId, onSelectFolder, onOpenFolder, roo
           className="w-full gap-2 bg-brand-navy hover:bg-brand-navy-dark text-white shadow-sm h-9 text-sm"
         >
           <FolderOpen className="h-4 w-4" />
-          Open Folder
+          {t.openFolder}
         </Button>
         {rootFolderName && (
           <p className="mt-2 text-[11px] text-gray-400 truncate text-center" title={rootFolderName}>
@@ -41,17 +43,17 @@ export function Sidebar({ folders, selectedId, onSelectFolder, onOpenFolder, roo
               <FolderSearch className="h-9 w-9 text-gray-300" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-500">No folder open</p>
-              <p className="text-xs text-gray-400 mt-0.5">Click "Open Folder" to get started</p>
+              <p className="text-sm font-medium text-gray-500">{t.noFolderOpenTitle}</p>
+              <p className="text-xs text-gray-400 mt-0.5">{t.noFolderOpenDesc}</p>
             </div>
           </div>
         ) : (
           <div className="p-2.5 space-y-1">
             <p className="px-2 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-gray-400 tabular-nums">
-              {folders.length} Records
+              {folders.length} {t.records}
               {countComplete(folders) > 0 && (
                 <span className="normal-case font-normal">
-                  {' '}· {countComplete(folders)} complete
+                  {' '}· {countComplete(folders)} {t.complete}
                 </span>
               )}
             </p>

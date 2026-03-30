@@ -1,4 +1,4 @@
-import { FolderOpen, FileText } from 'lucide-react';
+import { FolderOpen, Columns2 } from 'lucide-react';
 import { Button } from './ui/button';
 import {
   Breadcrumb, BreadcrumbItem, BreadcrumbLink,
@@ -6,16 +6,26 @@ import {
 } from './ui/breadcrumb';
 import { Separator } from './ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
-import { BRAND_NAME, BRAND_TAGLINE } from '../constants';
+import { BRAND_NAME } from '../constants';
+import { useLang } from '../i18n/LangContext';
+import { type Lang } from '../i18n/translations';
+import { cn } from './ui/utils';
+
+const LANGS: { id: Lang; label: string }[] = [
+  { id: 'en', label: 'EN' },
+  { id: 'fr', label: 'FR' },
+  { id: 'nl', label: 'NL' },
+];
 
 interface HeaderProps {
   folderPath?: string;
   onRefresh: () => void;
-  showPdf: boolean;
-  onTogglePdf: () => void;
+  compareMode: boolean;
+  onToggleCompare: () => void;
 }
 
-export function Header({ folderPath, onRefresh, showPdf, onTogglePdf }: HeaderProps) {
+export function Header({ folderPath, onRefresh, compareMode, onToggleCompare }: HeaderProps) {
+  const { lang, setLang, t } = useLang();
   const pathParts = folderPath?.split('/').filter(Boolean) ?? [];
 
   return (
@@ -26,7 +36,7 @@ export function Header({ folderPath, onRefresh, showPdf, onTogglePdf }: HeaderPr
             <img src="/ag-logo.svg" alt="AG Logo" className="h-8 w-auto" />
             <div>
               <h1 className="font-semibold text-sm text-brand-navy leading-tight">{BRAND_NAME}</h1>
-              <p className="text-[11px] text-brand-navy/50 leading-tight">{BRAND_TAGLINE}</p>
+              <p className="text-[11px] text-brand-navy/50 leading-tight">{t.brandTagline}</p>
             </div>
           </div>
 
@@ -37,7 +47,7 @@ export function Header({ folderPath, onRefresh, showPdf, onTogglePdf }: HeaderPr
               <BreadcrumbList className="flex-nowrap">
                 <BreadcrumbItem>
                   <BreadcrumbLink href="#" className="text-brand-navy/50 hover:text-brand-navy text-xs">
-                    Documents
+                    {t.breadcrumbRoot}
                   </BreadcrumbLink>
                 </BreadcrumbItem>
                 {pathParts.map((part, index) => (
@@ -59,23 +69,41 @@ export function Header({ folderPath, onRefresh, showPdf, onTogglePdf }: HeaderPr
               </BreadcrumbList>
             </Breadcrumb>
           ) : (
-            <span className="text-brand-navy/40 text-xs">No folder open — click Open Folder to begin</span>
+            <span className="text-brand-navy/40 text-xs">{t.noFolderOpenHint}</span>
           )}
         </div>
 
         <div className="flex items-center gap-2 flex-shrink-0">
+          {/* Language switcher */}
+          <div className="flex items-center rounded-md border border-brand-navy/20 overflow-hidden">
+            {LANGS.map(({ id, label }) => (
+              <button
+                key={id}
+                onClick={() => setLang(id)}
+                className={cn(
+                  'px-2.5 h-8 text-xs font-medium transition-colors duration-100',
+                  lang === id
+                    ? 'bg-brand-navy text-white'
+                    : 'text-brand-navy/60 hover:text-brand-navy hover:bg-brand-navy/8',
+                )}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  variant="ghost" size="sm" onClick={onTogglePdf}
-                  className={`gap-2 h-8 text-xs border ${showPdf ? 'text-brand-navy bg-brand-green/25 border-brand-green/50 hover:bg-brand-green/35' : 'text-brand-navy/70 hover:text-brand-navy hover:bg-brand-navy/8 border-brand-navy/20'}`}
+                  variant="ghost" size="sm" onClick={onToggleCompare}
+                  className={`w-[130px] justify-center gap-2 h-8 text-xs border ${compareMode ? 'text-brand-navy bg-brand-green/25 border-brand-green/50 hover:bg-brand-green/35' : 'text-brand-navy/70 hover:text-brand-navy hover:bg-brand-navy/8 border-brand-navy/20'}`}
                 >
-                  <FileText className="h-3.5 w-3.5" />
-                  {showPdf ? 'Hide PDF' : 'Show PDF'}
+                  <Columns2 className="h-3.5 w-3.5" />
+                  {t.compare}
                 </Button>
               </TooltipTrigger>
-              <TooltipContent><p>{showPdf ? 'Hide PDF viewer' : 'Show PDF viewer'}</p></TooltipContent>
+              <TooltipContent><p>{compareMode ? t.exitCompareMode : t.compareViewsSideBySide}</p></TooltipContent>
             </Tooltip>
           </TooltipProvider>
 
@@ -84,13 +112,13 @@ export function Header({ folderPath, onRefresh, showPdf, onTogglePdf }: HeaderPr
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost" size="sm" onClick={onRefresh}
-                  className="gap-2 text-brand-navy/70 hover:text-brand-navy hover:bg-brand-navy/8 border border-brand-navy/20 h-8 text-xs"
+                  className="w-[165px] justify-center gap-2 text-brand-navy/70 hover:text-brand-navy hover:bg-brand-navy/8 border border-brand-navy/20 h-8 text-xs"
                 >
                   <FolderOpen className="h-3.5 w-3.5" />
-                  Open Folder
+                  {t.openFolder}
                 </Button>
               </TooltipTrigger>
-              <TooltipContent><p>Open a folder to load documents</p></TooltipContent>
+              <TooltipContent><p>{t.openFolderTooltip}</p></TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
