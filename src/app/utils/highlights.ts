@@ -1,3 +1,5 @@
+import { formatValue } from './formatters';
+
 export interface HighlightEntry {
   text: string;
   color: string;
@@ -19,9 +21,15 @@ export function getBlockColor(blockIndex: number): string {
 }
 
 function collectStrings(obj: Record<string, unknown>): string[] {
-  return Object.values(obj)
-    .filter((v): v is string => typeof v === 'string' && v.trim().length >= 3)
-    .map(v => v.trim());
+  const results: string[] = [];
+  for (const v of Object.values(obj)) {
+    if (v === null || v === undefined || typeof v === 'object') continue;
+    const formatted = formatValue(v);
+    if (formatted !== '—' && formatted.trim().length >= 3) {
+      results.push(formatted.trim());
+    }
+  }
+  return results;
 }
 
 /**

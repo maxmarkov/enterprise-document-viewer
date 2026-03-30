@@ -119,9 +119,7 @@ export function MarkdownViewer({ markdown, json }: MarkdownViewerProps) {
   // Scroll to the active highlight when it changes
   useEffect(() => {
     if (!activeHighlight || !contentRef.current) return;
-    const el =
-      contentRef.current.querySelector<HTMLElement>('.search-highlight--active') ??
-      contentRef.current.querySelector<HTMLElement>('.search-highlight');
+    const el = contentRef.current.querySelector<HTMLElement>('.search-highlight--active');
     el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, [activeHighlight, markdown?.content]);
 
