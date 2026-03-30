@@ -10,7 +10,10 @@ export function formatValue(value: unknown): string {
   if (value === null || value === undefined) return '—';
   if (typeof value === 'boolean') return value ? 'Yes' : 'No';
   if (typeof value === 'number') return value.toLocaleString();
-  if (typeof value === 'string') return value;
+  if (typeof value === 'string') {
+    if (/^-?\d+\.0+$/.test(value.trim())) return parseInt(value, 10).toLocaleString();
+    return value;
+  }
   if (Array.isArray(value)) return `${value.length} items`;
   return JSON.stringify(value);
 }
