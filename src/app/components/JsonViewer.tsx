@@ -11,6 +11,17 @@ interface JsonViewerProps {
   json?: FolderRecord['files']['json'];
 }
 
+type SectionItem = { section_name: string; section_data: unknown };
+
+function isSectionList(data: unknown): data is SectionItem[] {
+  return (
+    Array.isArray(data) &&
+    data.length > 0 &&
+    typeof (data[0] as Record<string, unknown>)?.section_name === 'string' &&
+    'section_data' in (data[0] as Record<string, unknown>)
+  );
+}
+
 export function JsonViewer({ json }: JsonViewerProps) {
   const [copied, setCopied] = useState(false);
 
@@ -22,7 +33,8 @@ export function JsonViewer({ json }: JsonViewerProps) {
     setTimeout(() => setCopied(false), COPY_FEEDBACK_MS);
   };
 
-  const isObject = typeof json.data === 'object' && json.data !== null && !Array.isArray(json.data);
+  const data = json.data;
+  const isObject = typeof data === 'object' && data !== null && !Array.isArray(data);
 
   return (
     <div className="flex h-full flex-col bg-[#f8f9fc]">
@@ -46,13 +58,17 @@ export function JsonViewer({ json }: JsonViewerProps) {
 
       <div className="flex-1 min-h-0 overflow-y-auto">
         <div className="p-4 flex flex-col gap-3">
-          {isObject ? (
-            Object.entries(json.data).map(([k, v]) => (
+          {isSectionList(data) ? (
+            data.map((item, i) => (
+              <Section key={i} sectionKey={item.section_name} label={item.section_name} value={item.section_data} />
+            ))
+          ) : isObject ? (
+            Object.entries(data as Record<string, unknown>).map(([k, v]) => (
               <Section key={k} sectionKey={k} value={v} />
             ))
           ) : (
             <div className="rounded-md border border-gray-200 bg-gray-50 p-4 text-sm text-gray-800">
-              {formatValue(json.data)}
+              {formatValue(data)}
             </div>
           )}
         </div>

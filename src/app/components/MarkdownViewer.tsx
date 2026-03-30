@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 import { FileText, Copy, Check } from 'lucide-react';
 import { Button } from './ui/button';
 import { EmptyState } from './EmptyState';
@@ -44,7 +45,7 @@ export function MarkdownViewer({ markdown }: MarkdownViewerProps) {
 
       <div className="flex-1 min-h-0 overflow-y-auto">
         <div className="markdown-body px-6 py-5">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
             {markdown.content}
           </ReactMarkdown>
         </div>

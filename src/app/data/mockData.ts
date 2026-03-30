@@ -14,7 +14,7 @@ export interface FolderRecord {
       size: string;
     };
     json?: {
-      data: Record<string, unknown>;
+      data: unknown;
       size: string;
     };
   };

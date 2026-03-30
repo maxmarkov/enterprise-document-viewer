@@ -7,9 +7,10 @@ import { SectionValue } from './SectionValue';
 interface SectionProps {
   sectionKey: string;
   value: unknown;
+  label?: string;
 }
 
-export function Section({ sectionKey, value }: SectionProps) {
+export function Section({ sectionKey, value, label }: SectionProps) {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
@@ -19,7 +20,7 @@ export function Section({ sectionKey, value }: SectionProps) {
         className="w-full flex items-center justify-between bg-brand-green/10 hover:bg-brand-green/18 border-b border-brand-green/25 px-4 py-2.5 text-left transition-colors duration-100"
       >
         <span className="text-sm font-semibold text-brand-green/80">
-          {formatKey(sectionKey)}
+          {label ?? formatKey(sectionKey)}
         </span>
         <ChevronRight
           className="h-4 w-4 text-brand-green/50 transition-transform duration-150"
