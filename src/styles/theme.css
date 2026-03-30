@@ -1,5 +1,13 @@
 @custom-variant dark (&:is(.dark *));
 
+/* Highlighted search matches injected by the rehype highlight plugin */
+.search-highlight {
+  background-color: #fef08a;
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
 /* Markdown prose component — single source of truth for MarkdownViewer styling */
 .markdown-body {
   @apply prose prose-sm max-w-none;
