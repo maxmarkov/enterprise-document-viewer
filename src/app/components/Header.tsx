@@ -1,4 +1,4 @@
-import { FolderOpen, Columns2 } from 'lucide-react';
+import { FolderOpen, Columns2, Sparkles } from 'lucide-react';
 import { Button } from './ui/button';
 import {
   Breadcrumb, BreadcrumbItem, BreadcrumbLink,
@@ -22,9 +22,12 @@ interface HeaderProps {
   onRefresh: () => void;
   compareMode: boolean;
   onToggleCompare: () => void;
+  extractionMode: boolean;
+  onToggleExtract: () => void;
+  onLogoClick: () => void;
 }
 
-export function Header({ folderPath, onRefresh, compareMode, onToggleCompare }: HeaderProps) {
+export function Header({ folderPath, onRefresh, compareMode, onToggleCompare, extractionMode, onToggleExtract, onLogoClick }: HeaderProps) {
   const { lang, setLang, t } = useLang();
   const pathParts = folderPath?.split('/').filter(Boolean) ?? [];
 
@@ -32,13 +35,16 @@ export function Header({ folderPath, onRefresh, compareMode, onToggleCompare }: 
     <header className="border-b border-brand-green/25 bg-brand-green/10 shadow-md flex-shrink-0">
       <div className="flex h-14 items-center justify-between px-5">
         <div className="flex items-center gap-4 min-w-0">
-          <div className="flex items-center gap-3 flex-shrink-0">
+          <button
+            onClick={onLogoClick}
+            className="flex items-center gap-3 flex-shrink-0 rounded-md px-1 py-0.5 hover:bg-brand-navy/6 transition-colors"
+          >
             <img src="/ag-logo.svg" alt="AG Logo" className="h-8 w-auto" />
-            <div>
+            <div className="text-left">
               <h1 className="font-semibold text-sm text-brand-navy leading-tight">{BRAND_NAME}</h1>
               <p className="text-[11px] text-brand-navy/50 leading-tight">{t.brandTagline}</p>
             </div>
-          </div>
+          </button>
 
           <Separator orientation="vertical" className="h-7 bg-brand-navy/20 flex-shrink-0" />
 
@@ -91,6 +97,21 @@ export function Header({ folderPath, onRefresh, compareMode, onToggleCompare }: 
               </button>
             ))}
           </div>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost" size="sm" onClick={onToggleExtract}
+                  className={`w-[130px] justify-center gap-2 h-8 text-xs border ${extractionMode ? 'text-brand-navy bg-brand-green/25 border-brand-green/50 hover:bg-brand-green/35' : 'text-brand-navy/70 hover:text-brand-navy hover:bg-brand-navy/8 border-brand-navy/20'}`}
+                >
+                  <Sparkles className="h-3.5 w-3.5" />
+                  {t.extract}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent><p>{extractionMode ? t.exitExtractMode : t.extractTooltip}</p></TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
 
           <TooltipProvider>
             <Tooltip>

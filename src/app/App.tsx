@@ -3,6 +3,7 @@ import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { ViewerPanel } from './components/ViewerPanel';
 import { EmptyState } from './components/EmptyState';
+import { ExtractionPanel } from './components/ExtractionPanel';
 import { toast } from 'sonner';
 import { Toaster } from './components/ui/sonner';
 import { scanDirectory } from './utils/folderScanner';
@@ -10,6 +11,7 @@ import { useLang } from './i18n/LangContext';
 import type { FolderRecord } from './data/mockData';
 
 type ScanStatus = 'idle' | 'scanning' | 'ready';
+interface NamedHandle { name: string }
 
 export default function App() {
   const { t } = useLang();
@@ -18,6 +20,7 @@ export default function App() {
   const [rootFolderName, setRootFolderName] = useState<string | undefined>();
   const [scanStatus, setScanStatus] = useState<ScanStatus>('idle');
   const [compareMode, setCompareMode] = useState(false);
+  const [extractionMode, setExtractionMode] = useState(false);
 
   const selectedFolder = folders.find((f) => f.id === selectedFolderId);
 
@@ -53,6 +56,26 @@ export default function App() {
     }
   };
 
+  const handleExtractComplete = async (dirHandle: NamedHandle) => {
+    setRootFolderName(dirHandle.name);
+    setSelectedFolderId(undefined);
+    setScanStatus('scanning');
+
+    try {
+      const records = await scanDirectory(dirHandle as never);
+      setFolders(records);
+      setScanStatus('ready');
+      setExtractionMode(false);
+
+      if (records.length > 0) {
+        setSelectedFolderId(records[records.length - 1].id);
+        toast.success(t.extractionSuccess);
+      }
+    } catch {
+      setScanStatus('idle');
+    }
+  };
+
   return (
     <div className="flex h-screen flex-col bg-gray-100">
       <Toaster />
@@ -61,20 +84,27 @@ export default function App() {
         folderPath={selectedFolder ? `${rootFolderName}/${selectedFolder.path}` : rootFolderName}
         onRefresh={handlePickFolder}
         compareMode={compareMode}
-        onToggleCompare={() => setCompareMode((v) => !v)}
+        onToggleCompare={() => { setCompareMode((v) => !v); setExtractionMode(false); }}
+        extractionMode={extractionMode}
+        onToggleExtract={() => { setExtractionMode((v) => !v); setCompareMode(false); }}
+        onLogoClick={() => { setExtractionMode(false); setCompareMode(false); }}
       />
 
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar
-          folders={folders}
-          selectedId={selectedFolderId}
-          onSelectFolder={setSelectedFolderId}
-          onOpenFolder={handlePickFolder}
-          rootFolderName={rootFolderName}
-        />
+        {!extractionMode && (
+          <Sidebar
+            folders={folders}
+            selectedId={selectedFolderId}
+            onSelectFolder={setSelectedFolderId}
+            onOpenFolder={handlePickFolder}
+            rootFolderName={rootFolderName}
+          />
+        )}
 
         <div className="flex-1 overflow-hidden">
-          {scanStatus === 'scanning' ? (
+          {extractionMode ? (
+            <ExtractionPanel onComplete={handleExtractComplete} />
+          ) : scanStatus === 'scanning' ? (
             <div className="flex h-full items-center justify-center bg-[#f8f9fc]">
               <div className="flex flex-col items-center gap-3">
                 <div className="h-8 w-8 rounded-full border-2 border-brand-navy/20 border-t-brand-navy animate-spin" />

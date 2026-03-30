@@ -1,0 +1,6 @@
+fastapi
+uvicorn[standard]
+python-multipart
+azure-ai-documentintelligence
+openai>=1.0.0
+python-dotenv
