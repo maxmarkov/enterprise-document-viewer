@@ -18,6 +18,7 @@ export default function App() {
   const [selectedFolderId, setSelectedFolderId] = useState<string | undefined>();
   const [rootFolderName, setRootFolderName] = useState<string | undefined>();
   const [scanStatus, setScanStatus] = useState<ScanStatus>('idle');
+  const [showPdf, setShowPdf] = useState(false);
 
   const selectedFolder = folders.find((f) => f.id === selectedFolderId);
 
@@ -57,6 +58,8 @@ export default function App() {
       <Header
         folderPath={selectedFolder ? `${rootFolderName}/${selectedFolder.path}` : rootFolderName}
         onRefresh={handlePickFolder}
+        showPdf={showPdf}
+        onTogglePdf={() => setShowPdf((v) => !v)}
       />
 
       <div className="flex flex-1 overflow-hidden">
@@ -78,15 +81,18 @@ export default function App() {
             </div>
           ) : selectedFolder ? (
             <ResizablePanelGroup direction="horizontal" className="h-full">
-              <ResizablePanel defaultSize={35} minSize={20} maxSize={50} collapsible collapsedSize={0}>
-                <div className="h-full border-r border-gray-200">
-                  <DocumentViewer document={selectedFolder.files.document} />
-                </div>
-              </ResizablePanel>
+              {showPdf && (
+                <>
+                  <ResizablePanel defaultSize={35} minSize={20} maxSize={50} collapsible collapsedSize={0}>
+                    <div className="h-full border-r border-gray-200">
+                      <DocumentViewer document={selectedFolder.files.document} />
+                    </div>
+                  </ResizablePanel>
+                  <ResizableHandle className="w-[3px] bg-gray-200 hover:bg-brand-navy transition-colors duration-150" />
+                </>
+              )}
 
-              <ResizableHandle className="w-[3px] bg-gray-200 hover:bg-brand-navy transition-colors duration-150" />
-
-              <ResizablePanel defaultSize={65} minSize={30}>
+              <ResizablePanel defaultSize={showPdf ? 65 : 100} minSize={30}>
                 <div className="h-full flex">
                   <div className="flex-1 overflow-hidden border-r border-gray-200">
                     <MarkdownViewer markdown={selectedFolder.files.markdown} />

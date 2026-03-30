@@ -3,6 +3,8 @@
 
 @import 'tw-animate-css';
 
+@plugin "@tailwindcss/typography";
+
 @theme {
   --color-brand-navy: #1a2e6e;
   --color-brand-navy-dark: #162459;

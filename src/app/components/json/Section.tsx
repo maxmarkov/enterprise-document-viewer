@@ -16,13 +16,13 @@ export function Section({ sectionKey, value }: SectionProps) {
     <div className="rounded-lg border border-gray-200 overflow-hidden">
       <button
         onClick={() => setCollapsed((c) => !c)}
-        className="w-full flex items-center justify-between bg-gray-50 hover:bg-gray-100 border-b border-gray-200 px-4 py-2.5 text-left transition-colors duration-100"
+        className="w-full flex items-center justify-between bg-brand-green/10 hover:bg-brand-green/18 border-b border-brand-green/25 px-4 py-2.5 text-left transition-colors duration-100"
       >
-        <span className="text-sm font-semibold text-brand-navy">
+        <span className="text-sm font-semibold text-brand-green/80">
           {formatKey(sectionKey)}
         </span>
         <ChevronRight
-          className="h-4 w-4 text-gray-400 transition-transform duration-150"
+          className="h-4 w-4 text-brand-green/50 transition-transform duration-150"
           style={{ transform: collapsed ? 'rotate(0deg)' : 'rotate(90deg)' }}
         />
       </button>
