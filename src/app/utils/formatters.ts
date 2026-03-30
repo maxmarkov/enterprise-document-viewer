@@ -9,9 +9,9 @@ export function formatKey(key: string): string {
 export function formatValue(value: unknown): string {
   if (value === null || value === undefined) return '—';
   if (typeof value === 'boolean') return value ? 'Yes' : 'No';
-  if (typeof value === 'number') return value.toLocaleString();
+  if (typeof value === 'number') return Number.isInteger(value) ? value.toString() : value.toLocaleString();
   if (typeof value === 'string') {
-    if (/^-?\d+\.0+$/.test(value.trim())) return parseInt(value, 10).toLocaleString();
+    if (/^-?\d+\.0+$/.test(value.trim())) return parseInt(value, 10).toString();
     return value;
   }
   if (Array.isArray(value)) return `${value.length} items`;
