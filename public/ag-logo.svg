@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 499.99999 222.76744"
+   version="1.1"
+   id="svg28"
+   sodipodi:docname="logo.svg"
+   width="500"
+   height="222.76744"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview30"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="2.0219887"
+     inkscape:cx="127.84443"
+     inkscape:cy="113.25484"
+     inkscape:window-width="5120"
+     inkscape:window-height="1369"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg28" />
+  <!-- Generator: Sketch 59.1 (86144) - https://sketch.com -->
+  <title
+     id="title2">Group 9</title>
+  <desc
+     id="desc4">Created with Sketch.</desc>
+  <defs
+     id="defs8">
+    <polygon
+       id="path-1"
+       points="59.324979,45.562679 0,45.562679 0,0.097678711 59.324979,0.097678711 " />
+    <polygon
+       id="path-3"
+       points="51.524648,46.757771 0.022086914,46.757771 0.022086914,0 51.524648,0 " />
+  </defs>
+  <g
+     id="Page-1"
+     stroke="none"
+     stroke-width="0.209895"
+     fill="none"
+     fill-rule="evenodd"
+     transform="scale(4.7642869)">
+    <g
+       id="Universe_New"
+       transform="translate(-1217,-7832)"
+       style="stroke-width:0.209895">
+      <g
+         id="Bottom"
+         transform="translate(0,7552)"
+         style="stroke-width:0.209895">
+        <g
+           id="PositiveLine"
+           transform="translate(1155,257)"
+           style="stroke-width:0.209895">
+          <g
+             id="Group-9"
+             transform="translate(62,23)"
+             style="stroke-width:0.209895">
+            <g
+               id="Group-3"
+               transform="translate(0,0.512695)"
+               style="stroke-width:0.209895">
+              <mask
+                 id="mask-2"
+                 fill="#ffffff">
+                <use
+                   xlink:href="#path-1"
+                   id="use10" />
+              </mask>
+              <g
+                 id="Clip-2"
+                 style="stroke-width:0.209895" />
+              <path
+                 d="m 45.517479,45.510076 c -4.7775,0 -6.509999,-6.825 -6.9825,-9.5025 l -0.1575,-1.155 c 3.832501,-0.6825 7.7175,-1.1025 11.865001,-1.522397 l 0.262499,1.522397 c 3.307501,8.925 8.82,10.395 8.82,10.500103 z m -0.9975,-45.41239729 c 0,0 1.995001,12.07489729 3.8325,22.73239729 -4.0425,0.63 -7.822499,1.575103 -11.234999,2.73 l -1.785001,-13.2825 c 0,0 -1.784999,0.8925 -3.254999,3.36 -0.6825,1.155103 -5.775001,9.135103 -11.392501,18.1125 -5.092499,3.465 -7.8225,6.352603 -7.8225,6.352603 l 4.515,-0.8925 -3.989999,6.3525 H -2.0507813e-5 L 22.049979,11.700076 c 0,0 7.2975,-11.44489729 18.9525,-11.44489729 z"
+                 id="Fill-1"
+                 fill="#003366"
+                 mask="url(#mask-2)"
+                 style="stroke-width:0.0440559" />
+            </g>
+            <g
+               id="Group-6"
+               transform="translate(53.422852)"
+               style="stroke-width:0.209895">
+              <mask
+                 id="mask-4"
+                 fill="#ffffff">
+                <use
+                   xlink:href="#path-3"
+                   id="use16" />
+              </mask>
+              <g
+                 id="Clip-5"
+                 style="stroke-width:0.209895" />
+              <path
+                 d="m 25.064689,46.757771 c -18.8999996,0 -23.9924996,-8.294999 -25.04260209,-15.119897 4.04249999,-0.4725 8.13760259,-1.05 12.39000009,-1.837603 1.68,5.4075 8.295102,9.030001 19.792602,6.1425 l 2.834898,-10.7625 c 1.522603,-0.6825 3.045103,-1.364897 4.5675,-2.1525 2.625102,-1.259897 5.407603,-3.0975 8.19,-4.6725 l -5.879898,25.4625 c -5.67,1.785001 -10.395,2.94 -16.8525,2.94 M 1.2296894,20.455271 C 6.2695869,6.8577715 24.592189,-4.114626 51.524689,1.5027715 l -2.1525,9.4500005 c -18.4275,-3.3600005 -29.925,1.9425 -34.755102,8.610102 -4.9350001,0.3675 -9.2925001,0.524897 -13.3873976,0.892397"
+                 id="Fill-4"
+                 fill="#003366"
+                 mask="url(#mask-4)"
+                 style="stroke-width:0.0440559" />
+            </g>
+            <path
+               d="m 48.352469,23.290343 c 14.647603,-2.31 31.5525,-1.26 53.235001,-7.665 -36.435001,23.205 -62.790001,11.2875 -88.672501,24.937398 0,0 13.0725,-13.912398 35.4375,-17.272398 z"
+               id="Fill-7"
+               fill="#99cc00"
+               style="stroke-width:0.0440559" />
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
