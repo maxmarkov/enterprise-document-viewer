@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import { useLang } from '../i18n/LangContext';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
-import { visit } from 'unist-util-visit';
+import { visit, SKIP } from 'unist-util-visit';
 import { FileText, Copy, Check } from 'lucide-react';
 import { Button } from './ui/button';
 import { EmptyState } from './EmptyState';
@@ -18,44 +18,80 @@ interface MarkdownViewerProps {
   json?: FolderRecord['files']['json'];
 }
 
+function buildNonOverlappingMatches(
+  text: string,
+  highlights: HighlightEntry[],
+  activeText: string | null,
+): Array<{ start: number; end: number; color: string; isActive: boolean }> {
+  const textLower = text.toLowerCase();
+  const matches: Array<{ start: number; end: number; color: string; isActive: boolean }> = [];
+
+  for (const { text: ht, color } of highlights) {
+    const searchLower = ht.toLowerCase();
+    let pos = 0;
+    while (pos < textLower.length) {
+      const found = textLower.indexOf(searchLower, pos);
+      if (found === -1) break;
+      matches.push({
+        start: found,
+        end: found + ht.length,
+        color,
+        isActive: activeText !== null && searchLower === activeText.toLowerCase(),
+      });
+      pos = found + ht.length;
+    }
+  }
+
+  // Sort by position; prefer longer matches on ties, then remove overlaps
+  matches.sort((a, b) => a.start - b.start || b.end - a.end);
+  const result: typeof matches = [];
+  let lastEnd = 0;
+  for (const m of matches) {
+    if (m.start >= lastEnd) {
+      result.push(m);
+      lastEnd = m.end;
+    }
+  }
+  return result;
+}
+
+/** Wraps matched text in <mark> tags within a raw HTML string, leaving HTML tags untouched. */
+function applyMatchesToRawHtml(
+  html: string,
+  highlights: HighlightEntry[],
+  activeText: string | null,
+): string {
+  return html.replace(/<[^>]*>|[^<>]+/gs, (chunk: string) => {
+    if (chunk.startsWith('<')) return chunk;
+
+    const matches = buildNonOverlappingMatches(chunk, highlights, activeText);
+    if (matches.length === 0) return chunk;
+
+    let result = '';
+    let pos = 0;
+    for (const m of matches) {
+      result += chunk.slice(pos, m.start);
+      const cls = m.isActive
+        ? 'search-highlight search-highlight--active'
+        : 'search-highlight';
+      result += `<mark class="${cls}" style="background-color: ${m.color}; border-radius: 2px; padding: 0 2px;">${chunk.slice(m.start, m.end)}</mark>`;
+      pos = m.end;
+    }
+    result += chunk.slice(pos);
+    return result;
+  });
+}
+
 function createRehypeHighlight(highlights: HighlightEntry[], activeText: string | null) {
   return () => (tree: Root) => {
+    // Handle plain text nodes (regular markdown paragraphs, headings, etc.)
     visit(tree, 'text', (node: Text, index, parent) => {
       if (!parent || index === undefined) return;
 
       const value = node.value;
-      const valueLower = value.toLowerCase();
+      const nonOverlapping = buildNonOverlappingMatches(value, highlights, activeText);
 
-      const matches: Array<{ start: number; end: number; color: string; isActive: boolean }> = [];
-
-      for (const { text, color } of highlights) {
-        const searchLower = text.toLowerCase();
-        let pos = 0;
-        while (pos < valueLower.length) {
-          const found = valueLower.indexOf(searchLower, pos);
-          if (found === -1) break;
-          matches.push({
-            start: found,
-            end: found + text.length,
-            color,
-            isActive: activeText !== null && searchLower === activeText.toLowerCase(),
-          });
-          pos = found + text.length;
-        }
-      }
-
-      if (matches.length === 0) return;
-
-      // Sort by position; prefer longer matches on ties, then remove overlaps
-      matches.sort((a, b) => a.start - b.start || b.end - a.end);
-      const nonOverlapping: typeof matches = [];
-      let lastEnd = 0;
-      for (const m of matches) {
-        if (m.start >= lastEnd) {
-          nonOverlapping.push(m);
-          lastEnd = m.end;
-        }
-      }
+      if (nonOverlapping.length === 0) return;
 
       const parts: ElementContent[] = [];
       let pos = 0;
@@ -81,9 +117,16 @@ function createRehypeHighlight(highlights: HighlightEntry[], activeText: string 
         parts.push({ type: 'text', value: value.slice(pos) });
       }
 
-      if (parts.length > 0) {
-        (parent.children as ElementContent[]).splice(index, 1, ...parts);
-      }
+      (parent.children as ElementContent[]).splice(index, 1, ...parts);
+      // Skip past the newly inserted nodes to avoid double-visiting
+      return [SKIP, index + parts.length];
+    });
+
+    // Handle raw HTML nodes (e.g. HTML tables: <table>, <tr>, <td>, …)
+    // rehypeRaw will later parse these modified HTML strings, preserving the <mark> tags.
+    visit(tree, 'raw', (node: any) => {
+      if (typeof node.value !== 'string') return;
+      node.value = applyMatchesToRawHtml(node.value, highlights, activeText);
     });
   };
 }
@@ -111,7 +154,7 @@ export function MarkdownViewer({ markdown, json }: MarkdownViewerProps) {
   const rehypePlugins = useMemo(
     () =>
       highlights.length > 0
-        ? [rehypeRaw, createRehypeHighlight(highlights, activeHighlight)]
+        ? [createRehypeHighlight(highlights, activeHighlight), rehypeRaw]
         : [rehypeRaw],
     [highlights, activeHighlight],
   );
