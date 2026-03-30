@@ -24,11 +24,17 @@ function defaultTab(folder: FolderRecord): Tab {
 
 interface ViewerPanelProps {
   folder: FolderRecord;
+  initialTab?: Tab;
 }
 
-export function ViewerPanel({ folder }: ViewerPanelProps) {
+export function ViewerPanel({ folder, initialTab }: ViewerPanelProps) {
   const { t } = useLang();
-  const [activeTab, setActiveTab] = useState<Tab>(() => defaultTab(folder));
+  const [activeTab, setActiveTab] = useState<Tab>(() => {
+    if (initialTab && folder.files[initialTab === 'notes' ? 'markdown' : initialTab === 'data' ? 'json' : 'document']) {
+      return initialTab;
+    }
+    return defaultTab(folder);
+  });
   const [activeHighlight, setActiveHighlight] = useState<string | null>(null);
 
   // Clear highlight when the folder changes
@@ -95,7 +101,7 @@ export function ViewerPanel({ folder }: ViewerPanelProps) {
         {/* Active panel */}
         <div className="flex-1 min-h-0">
           {activeTab === 'document' && <DocumentViewer document={folder.files.document} />}
-          {activeTab === 'notes'    && <MarkdownViewer markdown={folder.files.markdown} />}
+          {activeTab === 'notes'    && <MarkdownViewer markdown={folder.files.markdown} json={folder.files.json} />}
           {activeTab === 'data'     && <JsonViewer json={folder.files.json} />}
         </div>
       </div>

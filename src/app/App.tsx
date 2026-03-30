@@ -87,7 +87,14 @@ export default function App() {
         onToggleCompare={() => { setCompareMode((v) => !v); setExtractionMode(false); }}
         extractionMode={extractionMode}
         onToggleExtract={() => { setExtractionMode((v) => !v); setCompareMode(false); }}
-        onLogoClick={() => { setExtractionMode(false); setCompareMode(false); }}
+        onLogoClick={() => {
+          setFolders([]);
+          setSelectedFolderId(undefined);
+          setRootFolderName(undefined);
+          setScanStatus('idle');
+          setCompareMode(false);
+          setExtractionMode(false);
+        }}
       />
 
       <div className="flex flex-1 overflow-hidden">
@@ -115,10 +122,10 @@ export default function App() {
             compareMode ? (
               <div className="flex h-full">
                 <div className="flex-1 min-w-0 border-r border-gray-200">
-                  <ViewerPanel key={`${selectedFolder.id}-left`} folder={selectedFolder} />
+                  <ViewerPanel key={`${selectedFolder.id}-left`} folder={selectedFolder} initialTab="notes" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <ViewerPanel key={`${selectedFolder.id}-right`} folder={selectedFolder} />
+                  <ViewerPanel key={`${selectedFolder.id}-right`} folder={selectedFolder} initialTab="data" />
                 </div>
               </div>
             ) : (

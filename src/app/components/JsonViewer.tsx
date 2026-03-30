@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import { EmptyState } from './EmptyState';
 import { Section } from './json/Section';
 import { formatValue } from '../utils/formatters';
+import { computeBlockOffsets } from '../utils/highlights';
 import { COPY_FEEDBACK_MS } from '../constants';
 import type { FolderRecord } from '../data/mockData';
 
@@ -38,6 +39,15 @@ export function JsonViewer({ json }: JsonViewerProps) {
   const data = json.data;
   const isObject = typeof data === 'object' && data !== null && !Array.isArray(data);
 
+  // Build section descriptors to compute global block offsets for consistent coloring
+  const sections: Array<{ key: string; label?: string; value: unknown }> = isSectionList(data)
+    ? data.map(item => ({ key: item.section_name, label: item.section_name, value: item.section_data }))
+    : isObject
+    ? Object.entries(data as Record<string, unknown>).map(([k, v]) => ({ key: k, value: v }))
+    : [];
+
+  const blockOffsets = computeBlockOffsets(sections.map(s => ({ value: s.value })));
+
   return (
     <div className="flex h-full flex-col bg-[#f8f9fc]">
       <div className="h-[3px] bg-emerald-500 flex-shrink-0" />
@@ -60,13 +70,15 @@ export function JsonViewer({ json }: JsonViewerProps) {
 
       <div className="flex-1 min-h-0 overflow-y-auto">
         <div className="p-4 flex flex-col gap-3">
-          {isSectionList(data) ? (
-            data.map((item, i) => (
-              <Section key={i} sectionKey={item.section_name} label={item.section_name} value={item.section_data} />
-            ))
-          ) : isObject ? (
-            Object.entries(data as Record<string, unknown>).map(([k, v]) => (
-              <Section key={k} sectionKey={k} value={v} />
+          {sections.length > 0 ? (
+            sections.map((s, i) => (
+              <Section
+                key={s.key}
+                sectionKey={s.key}
+                label={s.label}
+                value={s.value}
+                blockOffset={blockOffsets[i]}
+              />
             ))
           ) : (
             <div className="rounded-md border border-gray-200 bg-gray-50 p-4 text-sm text-gray-800">

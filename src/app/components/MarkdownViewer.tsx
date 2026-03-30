@@ -10,43 +10,75 @@ import { EmptyState } from './EmptyState';
 import { COPY_FEEDBACK_MS } from '../constants';
 import type { FolderRecord } from '../data/mockData';
 import { useHighlight } from './json/HighlightContext';
+import { extractHighlights, type HighlightEntry } from '../utils/highlights';
 import type { Root, Text, Element, ElementContent } from 'hast';
 
 interface MarkdownViewerProps {
   markdown?: FolderRecord['files']['markdown'];
+  json?: FolderRecord['files']['json'];
 }
 
-function createRehypeHighlight(searchText: string) {
+function createRehypeHighlight(highlights: HighlightEntry[], activeText: string | null) {
   return () => (tree: Root) => {
-    const searchLower = searchText.toLowerCase();
-
     visit(tree, 'text', (node: Text, index, parent) => {
       if (!parent || index === undefined) return;
-      const valueLower = node.value.toLowerCase();
-      if (!valueLower.includes(searchLower)) return;
+
+      const value = node.value;
+      const valueLower = value.toLowerCase();
+
+      const matches: Array<{ start: number; end: number; color: string; isActive: boolean }> = [];
+
+      for (const { text, color } of highlights) {
+        const searchLower = text.toLowerCase();
+        let pos = 0;
+        while (pos < valueLower.length) {
+          const found = valueLower.indexOf(searchLower, pos);
+          if (found === -1) break;
+          matches.push({
+            start: found,
+            end: found + text.length,
+            color,
+            isActive: activeText !== null && searchLower === activeText.toLowerCase(),
+          });
+          pos = found + text.length;
+        }
+      }
+
+      if (matches.length === 0) return;
+
+      // Sort by position; prefer longer matches on ties, then remove overlaps
+      matches.sort((a, b) => a.start - b.start || b.end - a.end);
+      const nonOverlapping: typeof matches = [];
+      let lastEnd = 0;
+      for (const m of matches) {
+        if (m.start >= lastEnd) {
+          nonOverlapping.push(m);
+          lastEnd = m.end;
+        }
+      }
 
       const parts: ElementContent[] = [];
       let pos = 0;
-      while (pos <= node.value.length) {
-        const found = valueLower.indexOf(searchLower, pos);
-        if (found === -1) {
-          if (pos < node.value.length) {
-            parts.push({ type: 'text', value: node.value.slice(pos) });
-          }
-          break;
-        }
-        if (found > pos) {
-          parts.push({ type: 'text', value: node.value.slice(pos, found) });
+      for (const m of nonOverlapping) {
+        if (m.start > pos) {
+          parts.push({ type: 'text', value: value.slice(pos, m.start) });
         }
         const mark: Element = {
           type: 'element',
           tagName: 'mark',
-          properties: { className: ['search-highlight'] },
-          children: [{ type: 'text', value: node.value.slice(found, found + searchText.length) }],
+          properties: {
+            className: m.isActive
+              ? ['search-highlight', 'search-highlight--active']
+              : ['search-highlight'],
+            style: `background-color: ${m.color}; border-radius: 2px; padding: 0 2px;`,
+          },
+          children: [{ type: 'text', value: value.slice(m.start, m.end) }],
         };
         parts.push(mark);
-        pos = found + searchLower.length;
-        if (pos >= node.value.length) break;
+        pos = m.end;
+      }
+      if (pos < value.length) {
+        parts.push({ type: 'text', value: value.slice(pos) });
       }
 
       if (parts.length > 0) {
@@ -56,24 +88,40 @@ function createRehypeHighlight(searchText: string) {
   };
 }
 
-export function MarkdownViewer({ markdown }: MarkdownViewerProps) {
+export function MarkdownViewer({ markdown, json }: MarkdownViewerProps) {
   const { t } = useLang();
   const [copied, setCopied] = useState(false);
   const { activeHighlight } = useHighlight();
   const contentRef = useRef<HTMLDivElement>(null);
 
+  const highlights = useMemo(() => {
+    const base = json ? extractHighlights(json.data) : [];
+    // If activeHighlight is not covered by auto-highlights, add it as a fallback
+    if (
+      activeHighlight &&
+      activeHighlight.length >= 2 &&
+      !base.some(h => h.text.toLowerCase() === activeHighlight.toLowerCase())
+    ) {
+      return [...base, { text: activeHighlight, color: '#fef08a' }];
+    }
+    return base;
+  }, [json, activeHighlight]);
+
   const rehypePlugins = useMemo(
     () =>
-      activeHighlight
-        ? [rehypeRaw, createRehypeHighlight(activeHighlight)]
+      highlights.length > 0
+        ? [rehypeRaw, createRehypeHighlight(highlights, activeHighlight)]
         : [rehypeRaw],
-    [activeHighlight],
+    [highlights, activeHighlight],
   );
 
+  // Scroll to the active highlight when it changes
   useEffect(() => {
     if (!activeHighlight || !contentRef.current) return;
-    const first = contentRef.current.querySelector<HTMLElement>('.search-highlight');
-    first?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const el =
+      contentRef.current.querySelector<HTMLElement>('.search-highlight--active') ??
+      contentRef.current.querySelector<HTMLElement>('.search-highlight');
+    el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, [activeHighlight, markdown?.content]);
 
   if (!markdown) return <EmptyState type="no-markdown" />;

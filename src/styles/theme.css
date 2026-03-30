@@ -1,11 +1,16 @@
 @custom-variant dark (&:is(.dark *));
 
-/* Highlighted search matches injected by the rehype highlight plugin */
+/* Highlighted search matches injected by the rehype highlight plugin.
+   Background color is set inline per-block; this provides base reset styles. */
 .search-highlight {
-  background-color: #fef08a;
   color: inherit;
   border-radius: 2px;
-  padding: 0 1px;
+  padding: 0 2px;
+}
+
+.search-highlight--active {
+  outline: 1.5px solid rgba(0, 0, 0, 0.25);
+  outline-offset: 1px;
 }
 
 /* Markdown prose component — single source of truth for MarkdownViewer styling */
