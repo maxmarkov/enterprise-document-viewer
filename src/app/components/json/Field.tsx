@@ -33,6 +33,7 @@ export function Field({ label, value, color }: { label: string; value: unknown; 
   const isHighlightable = value !== null && value !== undefined && formatted !== '—';
   const isActive = isHighlightable && activeHighlight === formatted;
   const showTooltip = hovered && !!color && isHighlightable && !!markdownContent;
+  const isFoundInMarkdown = isHighlightable && !!markdownContent && !!extractMarkdownContext(formatted, markdownContent);
 
   return (
     <div className="flex flex-col gap-1">
@@ -54,6 +55,7 @@ export function Field({ label, value, color }: { label: string; value: unknown; 
               : isHighlightable
               ? 'bg-gray-50 border-gray-200 hover:bg-gray-100 hover:border-gray-300'
               : 'bg-gray-50 border-gray-200',
+            isFoundInMarkdown && !isActive && 'border-l-2 border-l-emerald-400',
           )}
           style={
             isActive && color
