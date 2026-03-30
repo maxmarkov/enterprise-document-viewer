@@ -94,18 +94,19 @@ export function MarkdownViewer({ markdown, json }: MarkdownViewerProps) {
   const { activeHighlight } = useHighlight();
   const contentRef = useRef<HTMLDivElement>(null);
 
+  const baseHighlights = useMemo(() => (json ? extractHighlights(json.data) : []), [json]);
+
   const highlights = useMemo(() => {
-    const base = json ? extractHighlights(json.data) : [];
     // If activeHighlight is not covered by auto-highlights, add it as a fallback
     if (
       activeHighlight &&
       activeHighlight.length >= 2 &&
-      !base.some(h => h.text.toLowerCase() === activeHighlight.toLowerCase())
+      !baseHighlights.some(h => h.text.toLowerCase() === activeHighlight.toLowerCase())
     ) {
-      return [...base, { text: activeHighlight, color: '#fef08a' }];
+      return [...baseHighlights, { text: activeHighlight, color: '#fef08a' }];
     }
-    return base;
-  }, [json, activeHighlight]);
+    return baseHighlights;
+  }, [baseHighlights, activeHighlight]);
 
   const rehypePlugins = useMemo(
     () =>
@@ -144,6 +145,17 @@ export function MarkdownViewer({ markdown, json }: MarkdownViewerProps) {
           <span className="font-semibold text-sm text-gray-800">{t.notes}</span>
           <span className="rounded-md bg-violet-50 px-2 py-0.5 text-[11px] font-medium text-violet-600">MD</span>
           <span className="text-xs text-gray-400">{markdown.size}</span>
+          {baseHighlights.length > 0 && (
+            <div className="flex items-center gap-1" title="Fields found in notes">
+              {[...new Map(baseHighlights.map(h => [h.color, h.color])).values()].map(color => (
+                <span
+                  key={color}
+                  className="inline-block h-2 w-2 rounded-full"
+                  style={{ backgroundColor: color, boxShadow: `inset 0 0 0 1px rgba(0,0,0,0.15)` }}
+                />
+              ))}
+            </div>
+          )}
         </div>
         <Button variant="ghost" size="sm" onClick={handleCopy} className="h-7 gap-1.5 text-xs px-2">
           {copied

@@ -37,7 +37,7 @@ export const translations = {
     loadingDesc: 'Please wait.',
     // Viewer tabs
     tabDocument: 'Document',
-    tabNotes: 'Notes',
+    tabNotes: 'Text',
     tabData: 'Data',
     // DocumentViewer
     document: 'Document',
@@ -101,7 +101,7 @@ export const translations = {
     loadingTitle: 'Chargement…',
     loadingDesc: 'Veuillez patienter.',
     tabDocument: 'Document',
-    tabNotes: 'Notes',
+    tabNotes: 'Texte',
     tabData: 'Données',
     document: 'Document',
     loadingPdf: 'Chargement du PDF…',
@@ -161,7 +161,7 @@ export const translations = {
     loadingTitle: 'Laden…',
     loadingDesc: 'Even geduld.',
     tabDocument: 'Document',
-    tabNotes: 'Notities',
+    tabNotes: 'Tekst',
     tabData: 'Gegevens',
     document: 'Document',
     loadingPdf: 'PDF laden…',

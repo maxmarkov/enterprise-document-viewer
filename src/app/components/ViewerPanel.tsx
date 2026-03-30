@@ -10,10 +10,10 @@ import { HighlightContext } from './json/HighlightContext';
 
 type Tab = 'document' | 'notes' | 'data';
 
-const TAB_STYLE: Record<Tab, { Icon: React.ElementType; activeClass: string; dotClass: string }> = {
-  document: { Icon: File,     activeClass: 'text-brand-navy border-brand-navy',       dotClass: 'bg-brand-navy'   },
-  notes:    { Icon: FileText, activeClass: 'text-violet-600 border-violet-500',        dotClass: 'bg-violet-500'   },
-  data:     { Icon: FileJson, activeClass: 'text-emerald-600 border-emerald-500',      dotClass: 'bg-emerald-500'  },
+const TAB_STYLE: Record<Tab, { Icon: React.ElementType; activeClass: string }> = {
+  document: { Icon: File,     activeClass: 'bg-brand-navy/10 text-brand-navy'   },
+  notes:    { Icon: FileText, activeClass: 'bg-violet-100 text-violet-700'      },
+  data:     { Icon: FileJson, activeClass: 'bg-emerald-100 text-emerald-700'    },
 };
 
 function defaultTab(folder: FolderRecord): Tab {
@@ -62,12 +62,12 @@ export function ViewerPanel({ folder, initialTab }: ViewerPanelProps) {
   };
 
   return (
-    <HighlightContext.Provider value={{ activeHighlight, setHighlight: handleSetHighlight }}>
+    <HighlightContext.Provider value={{ activeHighlight, setHighlight: handleSetHighlight, markdownContent: folder.files.markdown?.content ?? null }}>
       <div className="flex h-full flex-col">
         {/* Tab bar */}
-        <div className="flex items-end bg-white border-b border-gray-200 px-4 flex-shrink-0">
+        <div className="flex items-center gap-1 bg-white border-b border-gray-200 px-3 py-2 flex-shrink-0">
           {(Object.keys(TAB_STYLE) as Tab[]).map((id) => {
-            const { Icon, activeClass, dotClass } = TAB_STYLE[id];
+            const { Icon, activeClass } = TAB_STYLE[id];
             const isActive = activeTab === id;
             const isAvailable = hasFile[id];
 
@@ -76,22 +76,18 @@ export function ViewerPanel({ folder, initialTab }: ViewerPanelProps) {
                 key={id}
                 onClick={() => isAvailable && setActiveTab(id)}
                 className={cn(
-                  'flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium border-b-2 -mb-px transition-colors duration-100',
+                  'flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors duration-100',
                   isActive && isAvailable
                     ? activeClass
                     : isAvailable
-                    ? 'text-gray-500 border-transparent hover:text-gray-800'
-                    : 'text-gray-300 border-transparent cursor-default',
-                  !isActive && 'border-transparent',
+                    ? 'text-gray-500 hover:text-gray-800 hover:bg-gray-100'
+                    : 'text-gray-300 cursor-default',
                 )}
               >
                 <Icon className="h-3.5 w-3.5" />
                 {tabLabels[id]}
                 {!isAvailable && (
                   <span className="rounded-full bg-gray-200 w-1.5 h-1.5 inline-block" />
-                )}
-                {isAvailable && isActive && (
-                  <span className={cn('rounded-full w-1.5 h-1.5 inline-block', dotClass)} />
                 )}
               </button>
             );

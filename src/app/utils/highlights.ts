@@ -83,6 +83,48 @@ export function extractHighlights(jsonData: unknown): HighlightEntry[] {
 }
 
 /**
+ * Finds the surrounding text snippet in markdown for a given field value.
+ * Returns the snippet with the matched portion marked, or null if not found.
+ */
+export function extractMarkdownContext(
+  text: string,
+  markdown: string,
+  contextChars = 110,
+): { before: string; match: string; after: string } | null {
+  const lower = markdown.toLowerCase();
+  const idx = lower.indexOf(text.toLowerCase());
+  if (idx === -1) return null;
+
+  const start = Math.max(0, idx - contextChars);
+  const end = Math.min(markdown.length, idx + text.length + contextChars);
+
+  // Strip markdown syntax for cleaner display
+  function clean(s: string) {
+    return s
+      .replace(/#{1,6}\s*/g, '')
+      .replace(/\*\*(.+?)\*\*/gs, '$1')
+      .replace(/\*(.+?)\*/gs, '$1')
+      .replace(/`(.+?)`/gs, '$1')
+      .replace(/\[(.+?)\]\(.+?\)/gs, '$1')
+      .replace(/\n+/g, ' ')
+      .trim();
+  }
+
+  let before = markdown.slice(start, idx);
+  const match = markdown.slice(idx, idx + text.length);
+  let after = markdown.slice(idx + text.length, end);
+
+  if (start > 0) before = before.replace(/^\S*\s?/, '');
+  if (end < markdown.length) after = after.replace(/\s?\S*$/, '');
+
+  return {
+    before: (start > 0 ? '…' : '') + clean(before),
+    match: clean(match),
+    after: clean(after) + (end < markdown.length ? '…' : ''),
+  };
+}
+
+/**
  * Computes the global block offset for each section so colors are stable
  * across the entire JSON viewer (not resetting per section).
  */
