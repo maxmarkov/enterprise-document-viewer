@@ -33,7 +33,7 @@ export function Field({ label, value, color }: { label: string; value: unknown; 
   const isHighlightable = value !== null && value !== undefined && formatted !== '—';
   const isActive = isHighlightable && activeHighlight === formatted;
   const showTooltip = hovered && !!color && isHighlightable && !!markdownContent;
-  const isFoundInMarkdown = isHighlightable && !!markdownContent && !!extractMarkdownContext(formatted, markdownContent);
+  const isFoundInMarkdown = isHighlightable && !!markdownContent && formatted.trim().length >= 3 && !!extractMarkdownContext(formatted, markdownContent);
 
   return (
     <div className="flex flex-col gap-1">
