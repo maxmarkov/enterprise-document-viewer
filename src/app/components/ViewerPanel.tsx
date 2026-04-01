@@ -37,9 +37,13 @@ export function ViewerPanel({ folder, initialTab }: ViewerPanelProps) {
   });
   const [activeHighlight, setActiveHighlight] = useState<string | null>(null);
 
-  // Clear highlight when the folder changes
+  // When folder changes: clear highlight, keep current tab if the new folder has that file
   useEffect(() => {
     setActiveHighlight(null);
+    if (!hasFile[activeTab]) {
+      setActiveTab(defaultTab(folder));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [folder.id]);
 
   function handleSetHighlight(text: string | null) {

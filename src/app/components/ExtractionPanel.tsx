@@ -31,6 +31,7 @@ export function ExtractionPanel({ onComplete }: ExtractionPanelProps) {
   const [step, setStep] = useState<Step | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
+  const [resultMessage, setResultMessage] = useState<string | null>(null);
 
   const isRunning = step !== null && !done && !error;
   const canExtract = pdfFile !== null && outputHandle !== null && !isRunning;
@@ -53,6 +54,7 @@ export function ExtractionPanel({ onComplete }: ExtractionPanelProps) {
     if (!pdfFile || !outputHandle) return;
     setError(null);
     setDone(false);
+    setResultMessage(null);
 
     try {
       // Step 1 — upload
@@ -62,7 +64,9 @@ export function ExtractionPanel({ onComplete }: ExtractionPanelProps) {
 
       // Step 2 — converting (optimistic: backend does both convert+extract in one call)
       setStep('converting');
+      console.log('[ExtractionPanel] Sending POST /api/extract', { filename: pdfFile.name, size: pdfFile.size });
       const response = await fetch('/api/extract', { method: 'POST', body: formData });
+      console.log('[ExtractionPanel] Response received', { status: response.status, ok: response.ok });
 
       if (!response.ok) {
         const body = await response.json().catch(() => ({}));
@@ -71,7 +75,15 @@ export function ExtractionPanel({ onComplete }: ExtractionPanelProps) {
 
       // Step 3 — extracting (data is already here, update label for UX clarity)
       setStep('extracting');
-      const result = await response.json() as { filename: string; markdown: string; json: unknown };
+      const result = await response.json() as { filename: string; message?: string; markdown?: string; json?: unknown };
+
+      if (result.message) {
+        // Test mode: backend returned a plain message
+        setResultMessage(result.message);
+        setDone(true);
+        setStep(null);
+        return;
+      }
 
       // Step 4 — save files to output folder
       setStep('saving');
@@ -79,7 +91,7 @@ export function ExtractionPanel({ onComplete }: ExtractionPanelProps) {
 
       const pdfArrayBuffer = await pdfFile.arrayBuffer();
       await writeFile(outputHandle, `${stem}.pdf`, new Blob([pdfArrayBuffer], { type: 'application/pdf' }));
-      await writeFile(outputHandle, `${stem}.md`, result.markdown);
+      await writeFile(outputHandle, `${stem}.md`, result.markdown ?? '');
       await writeFile(outputHandle, `${stem}.json`, JSON.stringify(result.json, null, 2));
 
       setDone(true);
@@ -192,6 +204,14 @@ export function ExtractionPanel({ onComplete }: ExtractionPanelProps) {
                   </div>
                 );
               })}
+            </div>
+          )}
+
+          {/* Backend message (test mode) */}
+          {resultMessage && (
+            <div className="flex items-start gap-2.5 rounded-lg bg-green-50 border border-green-100 px-4 py-3">
+              <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-green-600 mt-0.5" />
+              <p className="text-xs text-green-700 break-words">{resultMessage}</p>
             </div>
           )}
 

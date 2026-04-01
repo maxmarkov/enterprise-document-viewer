@@ -122,14 +122,14 @@ export default function App() {
             compareMode ? (
               <div className="flex h-full">
                 <div className="flex-1 min-w-0 border-r border-gray-200">
-                  <ViewerPanel key={`${selectedFolder.id}-left`} folder={selectedFolder} initialTab="notes" />
+                  <ViewerPanel key="left" folder={selectedFolder} initialTab="notes" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <ViewerPanel key={`${selectedFolder.id}-right`} folder={selectedFolder} initialTab="data" />
+                  <ViewerPanel key="right" folder={selectedFolder} initialTab="data" />
                 </div>
               </div>
             ) : (
-              <ViewerPanel key={selectedFolder.id} folder={selectedFolder} />
+              <ViewerPanel key="main" folder={selectedFolder} />
             )
           ) : (
             <EmptyState type="no-selection" />
